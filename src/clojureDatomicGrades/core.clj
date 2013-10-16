@@ -279,11 +279,11 @@
          :where
          [?u :unit/name ?unit-name]
          [?u :unit/children ?a]
-         (assignment/meangrade13 ?a ?mean-grade) ;the number has to be updated each time to circument an error
+         (assignment/meangrade13 ?a ?mean-grade)
          ]
        (d/db conn)
-       '[[(assignment/meangrade13 ?a ?mean-grade) ;idem
-           [(clojureDatomicGrades.core/assignment-mean-grade2 ?a) ?mean-grade]
+       '[[(assignment/meangrade13 ?a ?mean-grade)
+           [(clojureDatomicGrades.core/assignment-mean-grade2 ?a conn) ?mean-grade]; <-- this conn is undefined
           ]
          ]
        unit-names))

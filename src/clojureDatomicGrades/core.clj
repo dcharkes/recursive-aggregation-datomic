@@ -6,25 +6,25 @@
 
 ;(def uri "datomic:free://localhost:4334/grades-db")
 ;(def conn (d/connect uri))
-(def conn nil)
+;(def conn nil)
 
 
 ;; Helper functions : Database
-(defn find-student-id [name]
+(defn find-student-id [name conn]
   (ffirst (d/q '[:find ?id
                  :in $ ?name
                  :where [?id :student/name ?name]]
               (d/db conn)
               name)))
 
-(defn find-unit-id [name]
+(defn find-unit-id [name conn]
   (ffirst (d/q '[:find ?id
                  :in $ ?name
                  :where [?id :unit/name ?name]]
               (d/db conn)
               name)))
 
-(defn find-assignment-id [name]
+(defn find-assignment-id [name conn]
   (ffirst (d/q '[:find ?id
                  :in $ ?name
                  :where [?id :assignment/name ?name]]
@@ -38,34 +38,34 @@
 
 
 ;; Students
-(defn add-student [name]
+(defn add-student [name conn]
   @(d/transact conn [{:db/id (d/tempid :db.part/user)
                       :student/name name}]))
 
-(defn find-all-students []
+(defn find-all-students [conn]
   (d/q '[:find ?name
          :where [_ :student/name ?name]]
        (d/db conn)))
 
 
 ;; Units
-(defn add-unit [name]
+(defn add-unit [name conn]
   @(d/transact conn [{:db/id (d/tempid :db.part/user)
                       :unit/name name}]))
 
-(defn add-unit2 [name parent-name]
+(defn add-unit2 [name parent-name conn]
   (let [id (d/tempid :db.part/user)]
     @(d/transact conn [{:db/id id
                        :unit/name name}
-                      {:db/id (find-unit-id parent-name)
+                      {:db/id (find-unit-id parent-name conn)
                        :unit/children id}])))
 
-(defn find-all-units []
+(defn find-all-units [conn]
   (d/q '[:find ?name
          :where [_ :unit/name ?name]]
        (d/db conn)))
 
-(defn find-all-units-in [parent-name]
+(defn find-all-units-in [parent-name conn]
   (d/q '[:find ?name
          :in $ ?parent-name
          :where
@@ -76,7 +76,7 @@
        (d/db conn)
        parent-name))
 
-(defn find-all-units-in-recursive [parent-name]
+(defn find-all-units-in-recursive [parent-name conn]
   (d/q '[:find ?name
          :in $ % ?parent-name
          :where
@@ -95,19 +95,19 @@
 
 
 ;; Assignments
-(defn add-assignment [name unit-name]
+(defn add-assignment [name unit-name conn]
   (let [id (d/tempid :db.part/user)]
     @(d/transact conn [{:db/id id
                        :assignment/name name}
-                      {:db/id (find-unit-id unit-name)
+                      {:db/id (find-unit-id unit-name conn)
                        :unit/children id}])))
 
-(defn find-all-assignments []
+(defn find-all-assignments [conn]
   (d/q '[:find ?name
          :where [_ :assignment/name ?name]]
        (d/db conn)))
 
-(defn find-all-assignments-in [unit-name]
+(defn find-all-assignments-in [unit-name conn]
   (d/q '[:find ?name
          :in $ ?unit-name
          :where
@@ -118,7 +118,7 @@
        (d/db conn)
        unit-name))
 
-(defn find-all-assignments-in-recursive [unit-name]
+(defn find-all-assignments-in-recursive [unit-name conn]
   (d/q '[:find ?name
          :in $ % ?unit-name
          :where
@@ -137,21 +137,23 @@
 
 
 ;; Submissions
-(defn add-submission [data student-name assignment-name]
-  (let [id (d/tempid :db.part/user)]
+(defn add-submission [data student-name assignment-name conn]
+  (let [id (d/tempid :db.part/user)
+        student-id (find-student-id student-name conn)
+        assignment-id (find-assignment-id assignment-name conn)]
     @(d/transact conn [{:db/id id
                        :submission/data data}
                       {:db/id id
-                       :submission/student (find-student-id student-name)}
+                       :submission/student student-id}
                       {:db/id id
-                       :submission/assignment (find-assignment-id assignment-name)}])))
+                       :submission/assignment assignment-id}])))
 
-(defn find-all-submissions []
+(defn find-all-submissions [conn]
   (d/q '[:find ?data
          :where [_ :submission/data ?data]]
        (d/db conn)))
 
-(defn find-all-submissions-assignment [name]
+(defn find-all-submissions-assignment [name conn]
   (d/q '[:find ?data
          :in $ ?name
          :where
@@ -161,7 +163,7 @@
        (d/db conn)
        name))
 
-(defn find-all-submissions-student [name]
+(defn find-all-submissions-student [name conn]
   (d/q '[:find ?data
          :in $ ?name
          :where
@@ -171,7 +173,7 @@
        (d/db conn)
        name))
 
-(defn find-submission-student-assignment [student-name assignment-name]
+(defn find-submission-student-assignment [student-name assignment-name conn]
   (d/q '[:find ?data
          :in $ ?student-name ?assignment-name
          :where
@@ -190,7 +192,7 @@
 (defn calculate-grade [data] ;data is formatted like : Submission1
   (* 1.0 (mod (/ (read-string (subs data 10)) 10) 10)))
 
-(defn submission-grade [student-name assignment-name]
+(defn submission-grade [student-name assignment-name conn]
   (d/q '[:find ?grade
          :in $ % ?student-name ?assignment-name
          :where
@@ -208,7 +210,7 @@
        student-name
        assignment-name))
 
-(defn assignment-grades [assignment-name]
+(defn assignment-grades [assignment-name conn]
   (d/q '[:find ?student-name ?grade
          :in $ % ?assignment-name
          :where
@@ -225,7 +227,7 @@
          ]
        assignment-name))
 
-(defn assignment-mean-grade [assignment-name]
+(defn assignment-mean-grade [assignment-name conn]
   (d/q '[:find (avg ?grade)
          :in $ % ?assignment-name
          :where
@@ -240,7 +242,7 @@
          ]
        assignment-name))
 
-(defn assignment-mean-grades [assignment-names]
+(defn assignment-mean-grades [assignment-names conn]
   (d/q '[:find ?assignment-name (avg ?grade)
          :in $ % [?assignment-name ...]
          :where
@@ -256,7 +258,7 @@
        assignment-names))
 
 
-(defn assignment-mean-grade2 [assignment-id]
+(defn assignment-mean-grade2 [assignment-id conn]
   (ffirst
   (d/q '[:find (avg ?grade)
          :in $ % ?a
@@ -271,16 +273,16 @@
          ]
        assignment-id)))
 
-(defn unit-mean-grades [unit-names]
+(defn unit-mean-grades [unit-names conn]
   (d/q '[:find ?unit-name (avg ?mean-grade)
          :in $ % [?unit-name ...]
          :where
          [?u :unit/name ?unit-name]
          [?u :unit/children ?a]
-         (assignment/meangrade10 ?a ?mean-grade) ;the number has to be updated each time to circument an error
+         (assignment/meangrade13 ?a ?mean-grade) ;the number has to be updated each time to circument an error
          ]
        (d/db conn)
-       '[[(assignment/meangrade10 ?a ?mean-grade) ;idem
+       '[[(assignment/meangrade13 ?a ?mean-grade) ;idem
            [(clojureDatomicGrades.core/assignment-mean-grade2 ?a) ?mean-grade]
           ]
          ]
@@ -288,3 +290,4 @@
 
 
 
+

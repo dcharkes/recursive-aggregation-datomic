@@ -188,7 +188,7 @@
 
 ;; Grades
 (defn calculate-grade [data] ;data is formatted like : Submission1
-  (* 1.0 (mod (/ (read-string (subs data 10)) 10) 10)))
+  (-> data (subs 10) (read-string) (/ 10) (mod 10) (* 1.0)))
 
 (defn submission-grade [student-name assignment-name]
   (d/q '[:find ?grade
@@ -288,3 +288,4 @@
 
 
 
+

@@ -255,5 +255,38 @@
           (let [db (d/db conn)]
           (unit-mean-grades db ["Calculus" "Exam" "Practical"])))))
 
+(expect #{[0.1]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-unit "Calculus")
+          (add-assignment "Assignment1" "Calculus")
+          (add-submission "Submission1" "Suze" "Assignment1")
+          (let [db (d/db conn)]
+          (student-assignment-grade db "Suze" "Assignment1")))))
 
-
+(expect #{[5.5]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-unit "Calculus")
+          (add-assignment "Assignment1" "Calculus")
+          (add-assignment "Assignment2" "Calculus")
+          (add-submission "Submission33" "Suze" "Assignment1")
+          (add-submission "Submission77" "Suze" "Assignment2")
+          (let [db (d/db conn)]
+          (student-unit-mean-grade db "Suze" "Calculus")))))
+
+;; (expect #{[0.5]}
+;;         (with-redefs [conn (create-empty-in-memory-db)]
+;;         (do
+;;           (add-student "Suze")
+;;           (add-unit "Calculus")
+;;           (add-unit2 "Exam" "Calculus")
+;;           (add-unit2 "Practical" "Calculus")
+;;           (add-assignment "Assignment1" "Practical")
+;;           (add-assignment "Exam" "Exam")
+;;           (add-submission "Submission1" "Suze" "Assignment1")
+;;           (add-submission "Submission9" "Suze" "Exam")
+;;           (let [db (d/db conn)]
+;;           (student-unit-mean-grade db "Suze" "Calculus")))))

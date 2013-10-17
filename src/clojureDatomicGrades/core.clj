@@ -256,7 +256,7 @@
        assignment-names))
 
 
-(defn assignment-mean-grade2 [assignment-id]
+(defn assignment-mean-grade2 [db assignment-id]
   (ffirst
   (d/q '[:find (avg ?grade)
          :in $ % ?a
@@ -264,14 +264,14 @@
          [?s :submission/assignment ?a]
          (submission/grade ?s ?grade)
          ]
-       (d/db conn)
+       db
        '[[(submission/grade ?s ?grade)
            [?s :submission/data ?data]
            [(clojureDatomicGrades.core/calculate-grade ?data) ?grade]]
          ]
        assignment-id)))
 
-(defn unit-mean-grades [unit-names]
+(defn unit-mean-grades [db unit-names]
   (d/q '[:find ?unit-name (avg ?mean-grade)
          :in $ % [?unit-name ...]
          :where
@@ -279,12 +279,14 @@
          [?u :unit/children ?a]
          (assignment/meangrade10 ?a ?mean-grade) ;the number has to be updated each time to circument an error
          ]
-       (d/db conn)
+       db
        '[[(assignment/meangrade10 ?a ?mean-grade) ;idem
-           [(clojureDatomicGrades.core/assignment-mean-grade2 ?a) ?mean-grade]
+           [(clojureDatomicGrades.core/assignment-mean-grade2 $ ?a) ?mean-grade]
           ]
          ]
        unit-names))
+
+
 
 
 

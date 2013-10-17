@@ -218,7 +218,8 @@
           (add-submission "Submission3" "Jack" "Assignment1")
           (add-submission "Submission5" "Suze" "Assignment2")
           (add-submission "Submission7" "Jack" "Assignment2")
-          (unit-mean-grades ["Calculus"]))))
+          (let [db (d/db conn)]
+          (unit-mean-grades db ["Calculus"])))))
 
 
 

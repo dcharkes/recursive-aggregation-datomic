@@ -47,36 +47,36 @@
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
           (find-all-units))))
 
 (expect #{["Exam"] ["Practical"]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
           (find-all-units-in "Calculus"))))
 
 (expect #{["Exam"] ["Practical"]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
-          (add-unit2 "Part1" "Practical")
-          (add-unit2 "Part2" "Practical")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
+          (add-unit "Part1" "Practical")
+          (add-unit "Part2" "Practical")
           (find-all-units-in "Calculus"))))
 
 (expect #{["Exam"] ["Practical"] ["Part1"] ["Part2"]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
-          (add-unit2 "Part1" "Practical")
-          (add-unit2 "Part2" "Practical")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
+          (add-unit "Part1" "Practical")
+          (add-unit "Part2" "Practical")
           (find-all-units-in-recursive "Calculus"))))
 
 ;; Assignments
@@ -109,7 +109,7 @@
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (add-unit "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Practical" "Calculus")
           (add-assignment "Assignment1" "Practical")
           (add-assignment "Assignment2" "Practical")
           (add-assignment "Exam" "Calculus")
@@ -234,8 +234,8 @@
         (do
           (add-student "Suze")
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
           (add-assignment "Assignment1" "Practical")
           (add-assignment "Exam" "Exam")
           (add-submission "Submission1" "Suze" "Assignment1")
@@ -249,8 +249,8 @@
           (add-student "Suze")
           (add-student "Jack")
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
           (add-assignment "Assignment1" "Practical")
           (add-assignment "Assignment2" "Practical")
           (add-assignment "Exam" "Exam")
@@ -269,11 +269,11 @@
           (add-student "Suze")
           (add-student "Joey")
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
+          (add-unit "Exam" "Calculus")
           (add-assignment "Exam" "Exam")
-          (add-unit2 "Practical" "Calculus")
-          (add-unit2 "Assignment1" "Practical")
-          (add-unit2 "Assignment1.1" "Assignment1")
+          (add-unit "Practical" "Calculus")
+          (add-unit "Assignment1" "Practical")
+          (add-unit "Assignment1.1" "Assignment1")
           (add-assignment "Assignment1.1.1" "Assignment1.1")
           (add-assignment "Assignment1.1.2" "Assignment1.1")
           (add-assignment "Assignment1.2" "Assignment1")
@@ -359,8 +359,8 @@
         (do
           (add-student "Suze")
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
-          (add-unit2 "Practical" "Calculus")
+          (add-unit "Exam" "Calculus")
+          (add-unit "Practical" "Calculus")
           (add-assignment "Assignment1" "Practical")
           (add-assignment "Exam" "Exam")
           (add-submission "Submission1" "Suze" "Assignment1")
@@ -374,11 +374,11 @@
           (add-student "Suze")
           (add-student "Joey")
           (add-unit "Calculus")
-          (add-unit2 "Exam" "Calculus")
+          (add-unit "Exam" "Calculus")
           (add-assignment "Exam" "Exam")
-          (add-unit2 "Practical" "Calculus")
-          (add-unit2 "Assignment1" "Practical")
-          (add-unit2 "Assignment1.1" "Assignment1")
+          (add-unit "Practical" "Calculus")
+          (add-unit "Assignment1" "Practical")
+          (add-unit "Assignment1.1" "Assignment1")
           (add-assignment "Assignment1.1.1" "Assignment1.1")
           (add-assignment "Assignment1.1.2" "Assignment1.1")
           (add-assignment "Assignment1.2" "Assignment1")

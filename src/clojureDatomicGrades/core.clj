@@ -55,16 +55,18 @@
 
 
 ;; Units
-(defn add-unit [name]
-  @(d/transact conn [{:db/id (d/tempid :db.part/user)
-                      :unit/name name}]))
-
-(defn add-unit2 [name parent-name]
-  (let [id (d/tempid :db.part/user)]
-    @(d/transact conn [{:db/id id
-                       :unit/name name}
-                      {:db/id (find-unit-id parent-name)
-                       :unit/children id}])))
+(defn add-unit
+  ([name]
+   @(d/transact conn [{:db/id (d/tempid :db.part/user)
+                       :unit/name name}])
+   )
+  ([name parent-name]
+   (let [id (d/tempid :db.part/user)]
+     @(d/transact conn [{:db/id id
+                         :unit/name name}
+                        {:db/id (find-unit-id parent-name)
+                         :unit/children id}]))
+   ))
 
 (defn find-all-units []
   (d/q '[:find ?name
@@ -284,15 +286,15 @@
   (d/q '[:find (avg ?mean-grade)
          :in $ % ?u
          :where
-         (unit/meangrade2 ?u ?mean-grade)
+         (unit/meangrade ?u ?mean-grade)
          ]
        db
-       '[[(unit/meangrade2 ?u ?mean-grade)
+       '[[(unit/meangrade ?u ?mean-grade)
            [?u :unit/children ?a]
            [?a :assignment/name _]
            [(clojureDatomicGrades.core/assignment-mean-grade-on-id $ ?a) ?mean-grade]
           ]
-         [(unit/meangrade2 ?u ?mean-grade)
+         [(unit/meangrade ?u ?mean-grade)
            [?u :unit/children ?c]
            [?c :unit/name _]
            [(clojureDatomicGrades.core/unit-mean-grade-on-id $ ?c) ?mean-grade]
@@ -305,10 +307,10 @@
          :in $ % [?unit-name ...]
          :where
          [?u :unit/name ?unit-name]
-         (unit/meangrade ?u ?mean-grade)
+         (unit/meangrade-on-id ?u ?mean-grade)
          ]
        db
-       '[[(unit/meangrade ?a ?mean-grade)
+       '[[(unit/meangrade-on-id ?a ?mean-grade)
            [(clojureDatomicGrades.core/unit-mean-grade-on-id $ ?a) ?mean-grade]
           ]
          ]
@@ -353,15 +355,15 @@
   (d/q '[:find (avg ?mean-grade)
          :in $ % ?u ?st
          :where
-         (unit/meangrade2 ?u ?st ?mean-grade)
+         (student-unit/meangrade ?u ?st ?mean-grade)
          ]
        db
-       '[[(unit/meangrade2 ?u ?st ?mean-grade)
+       '[[(student-unit/meangrade ?u ?st ?mean-grade)
            [?u :unit/children ?a]
            [?a :assignment/name _]
            [(clojureDatomicGrades.core/student-assignment-grade-on-id $ ?a ?st) ?mean-grade]
           ]
-         [(unit/meangrade2 ?u ?st ?mean-grade)
+         [(student-unit/meangrade ?u ?st ?mean-grade)
            [?u :unit/children ?c]
            [?c :unit/name _]
            [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?c ?st) ?mean-grade]
@@ -376,10 +378,10 @@
          :where
          [?u :unit/name ?unit-name]
          [?st :student/name ?student-name]
-         (unit/meangrade ?u ?st ?mean-grade)
+         (student-unit/meangrade-on-id ?u ?st ?mean-grade)
          ]
        db
-       '[[(unit/meangrade ?a ?st ?mean-grade)
+       '[[(student-unit/meangrade-on-id ?a ?st ?mean-grade)
            [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?a ?st) ?mean-grade]
           ]
          ]

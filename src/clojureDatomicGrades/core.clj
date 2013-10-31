@@ -42,6 +42,12 @@
   @(d/transact conn [{:db/id (d/tempid :db.part/user)
                       :student/name name}]))
 
+(defn add-students [names]
+  @(d/transact
+    conn
+    (map #(identity {:db/id (d/tempid :db.part/user)
+                     :student/name %}) names)))
+
 (defn find-all-students []
   (d/q '[:find ?name
          :where [_ :student/name ?name]]

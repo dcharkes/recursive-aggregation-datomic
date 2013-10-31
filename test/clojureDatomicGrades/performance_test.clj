@@ -28,90 +28,19 @@
           (add-student "John")
           (find-all-students))))
 
-;; (expect #{["John"]}
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (profile "create 1 student" (add-student "John"))
-;;           (find-all-students))))
-
-;; (expect #{["Suze"] ["Jack"] ["Job"] ["Tanja"]}
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (profile
-;;            "create 4 students"
-;;            (do
-;;              (add-student "Jack")
-;;              (add-student "Suze")
-;;              (add-student "Job")
-;;              (add-student "Tanja")
-;;              ))
-;;           (find-all-students))))
-
-;; (expect (into #{} (map #(vector (str "Student" %)) (range 1 11)))
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (profile
-;;            "create 10 students"
-;;            (doall (map #(add-student %) (map #(str "Student" %) (range 1 11)))))
-;;           (find-all-students)
-;;           )))
-
-;; (expect (into #{} (map #(vector (str "Student" %)) (range 1 101)))
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (profile
-;;            "create 100 students"
-;;            (doall (map #(add-student %) (map #(str "Student" %) (range 1 101)))))
-;;           (find-all-students)
-;;           )))
-
 (expect (into #{} (map #(vector (str "Student" %)) (range 1 1001)))
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
           (profile
            "create 1000 students"
-           (doall (map #(add-student %) (map #(str "Student" %) (range 1 1001)))))
+           (add-students (map #(str "Student" %) (range 1 1001))))
           (find-all-students)
           )))
-
-
-;; (expect #{["Jack"]}
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (add-student "Jack")
-;;           (profile "read 1 student" (find-all-students)))))
-
-;; (expect #{["Suze"] ["Jack"] ["Job"] ["Tanja"]}
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (add-student "Jack")
-;;           (add-student "Suze")
-;;           (add-student "Job")
-;;           (add-student "Tanja")
-;;           (profile "read 4 students" (find-all-students)))))
-
-;; (expect (into #{} (map #(vector (str "Student" %)) (range 1 11)))
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (doall (map #(add-student %) (map #(str "Student" %) (range 1 11))))
-;;           (profile
-;;            "read 10 students"
-;;            (find-all-students))
-;;           )))
-
-;; (expect (into #{} (map #(vector (str "Student" %)) (range 1 101)))
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (doall (map #(add-student %) (map #(str "Student" %) (range 1 101))))
-;;           (profile
-;;            "read 100 students"
-;;            (find-all-students))
-;;           )))
 
 (expect (into #{} (map #(vector (str "Student" %)) (range 1 1001)))
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
-          (doall (map #(add-student %) (map #(str "Student" %) (range 1 1001))))
+          (add-students (map #(str "Student" %) (range 1 1001)))
           (profile
            "read 1000 students"
            (find-all-students))

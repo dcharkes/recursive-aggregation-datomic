@@ -30,6 +30,12 @@
           (add-student "Suze")
           (find-all-students))))
 
+(expect #{["John"] ["Suze"]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-students ["John" "Suze"])
+          (find-all-students))))
+
 ;; Units
 (expect #{["Calculus"]}
         (with-redefs [conn (create-empty-in-memory-db)]

@@ -68,6 +68,34 @@
                          :unit/children id}]))
    ))
 
+(defn add-units
+  [names-and-parent-names]
+
+   ; grabbing the first works
+;;    (let [id (d/tempid :db.part/user)]
+;;      @(d/transact conn [{:db/id id
+;;                          :unit/name (ffirst names-and-parent-names)}
+;;                         {:db/id (find-unit-id (second (first names-and-parent-names)))
+;;                          :unit/children id}]))
+
+   ; grabbing the first works
+;;    (let [id (d/tempid :db.part/user)]
+;;                        [{:db/id id
+;;                          :unit/name (ffirst names-and-parent-names)}
+;;                         {:db/id (find-unit-id (second (first names-and-parent-names)))
+;;                          :unit/children id}])
+
+   ; wrapping in a map thows a null pointer
+;;    (map
+;;     #(let [id (d/tempid :db.part/user)]
+;;                       [{:db/id id
+;;                         :unit/name (first %)}
+;;                        {:db/id (find-unit-id (second %))
+;;                         :unit/children id}])
+;;     names-and-parent-names)
+
+  )
+
 (defn find-all-units []
   (d/q '[:find ?name
          :where [_ :unit/name ?name]]

@@ -43,6 +43,15 @@
           (add-unit "Calculus")
           (find-all-units))))
 
+;; (expect #{["Calculus"] ["Exam"] ["Practical"]}
+;;         (with-redefs [conn (create-empty-in-memory-db)]
+;;         (do
+;;           (add-unit "Calculus")
+;;           (add-units [["Exam" "Calculus"]
+;;                       ["Practical" "Calculus"]])
+;;           (find-all-units)
+;;           )))
+
 (expect #{["Calculus"] ["Exam"] ["Practical"]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
@@ -50,6 +59,7 @@
           (add-unit "Exam" "Calculus")
           (add-unit "Practical" "Calculus")
           (find-all-units))))
+
 
 (expect #{["Exam"] ["Practical"]}
         (with-redefs [conn (create-empty-in-memory-db)]

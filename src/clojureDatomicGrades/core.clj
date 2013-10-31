@@ -186,7 +186,7 @@
        assignment-name))
 
 
-;; Grades
+;; Grades: Submissions
 (defn calculate-grade [data] ;data is formatted like : Submission1
   (-> data (subs 10) (read-string) (/ 10) (mod 10) (* 1.0)))
 
@@ -208,6 +208,7 @@
        student-name
        assignment-name))
 
+;; Grades: Assignment means
 (defn assignment-grades [assignment-name]
   (d/q '[:find ?student-name ?grade
          :in $ % ?assignment-name
@@ -271,6 +272,7 @@
          ]
        assignment-id)))
 
+;; Grades: Unit means
 (defn unit-mean-grade-on-id [db unit-id]
   (ffirst
   (d/q '[:find (avg ?mean-grade)
@@ -306,6 +308,7 @@
          ]
        unit-names))
 
+;; Grades: Student Assignments
 (defn student-assignment-grade-on-id [db assignment-id student-id]
   (ffirst
   (d/q '[:find ?grade
@@ -338,46 +341,46 @@
        student-name
        assignment-name))
 
+;; Grades: Student Unit means
 (defn student-unit-mean-grade-on-id [db unit-id student-id]
   (ffirst
-  (d/q '[:find ?grade
+  (d/q '[:find (avg ?mean-grade)
          :in $ % ?u ?st
          :where
-;;            [?u :unit/children ?a]
-;;            [?a :assignment/name ?grade] ;;only returns 1 name instead of two.
-         (unit/grade ?u ?st ?grade)
+         (unit/meangrade2 ?u ?st ?mean-grade)
          ]
        db
-       '[
-         [(unit/grade ?u ?st ?grade)
+       '[[(unit/meangrade2 ?u ?st ?mean-grade)
            [?u :unit/children ?a]
            [?a :assignment/name _]
-           [(clojureDatomicGrades.core/student-assignment-grade-on-id $ ?a ?st) ?grade]]
-         [(unit/grade ?u ?st ?grade)
+           [(clojureDatomicGrades.core/student-assignment-grade-on-id $ ?a ?st) ?mean-grade]
+          ]
+         [(unit/meangrade2 ?u ?st ?mean-grade)
            [?u :unit/children ?c]
            [?c :unit/name _]
-           [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?c ?st) ?grade]]
+           [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?c ?st) ?mean-grade]
+          ]
          ]
        unit-id
        student-id)))
 
 (defn student-unit-mean-grade [db student-name unit-name]
-  (d/q '[:find ?grade
-         :in $ % ?student-name ?unit-name
+  (d/q '[:find ?mean-grade
+         :in $ % ?unit-name ?student-name
          :where
          [?u :unit/name ?unit-name]
          [?st :student/name ?student-name]
-         (student-unit/mean-grade ?u ?st ?grade)
+         (unit/meangrade ?u ?st ?mean-grade)
          ]
        db
-       '[[(student-unit/mean-grade ?u ?st ?grade)
-;;            [?u :unit/children ?a]
-;;            [?a :assignment/name ?grade] ;;returns 2 names (and should be two)
-           [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?u ?st) ?grade]
+       '[[(unit/meangrade ?a ?st ?mean-grade)
+           [(clojureDatomicGrades.core/student-unit-mean-grade-on-id $ ?a ?st) ?mean-grade]
           ]
          ]
-       student-name
-       unit-name))
+       unit-name
+       student-name))
+
+
 
 
 

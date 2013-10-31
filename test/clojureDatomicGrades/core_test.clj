@@ -170,6 +170,7 @@
           (add-submission "Submission1" "Suze" "Assignment1")
           (submission-grade "Suze" "Assignment1"))))
 
+;; Grades: Assignment means
 (expect #{["Suze" 0.1] ["Jack" 0.2]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
@@ -206,6 +207,7 @@
           (add-submission "Submission7" "Jack" "Assignment2")
           (assignment-mean-grades ["Assignment1" "Assignment2"]))))
 
+;; Grades: Unit means
 (expect [["Calculus" 0.4] ]
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
@@ -255,6 +257,35 @@
           (let [db (d/db conn)]
           (unit-mean-grades db ["Calculus" "Exam" "Practical"])))))
 
+(expect [["Calculus" 0.4] ["Exam" 0.6] ["Practical" 0.2] ]
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-student "Joey")
+          (add-unit "Calculus")
+          (add-unit2 "Exam" "Calculus")
+          (add-assignment "Exam" "Exam")
+          (add-unit2 "Practical" "Calculus")
+          (add-unit2 "Assignment1" "Practical")
+          (add-unit2 "Assignment1.1" "Assignment1")
+          (add-assignment "Assignment1.1.1" "Assignment1.1")
+          (add-assignment "Assignment1.1.2" "Assignment1.1")
+          (add-assignment "Assignment1.2" "Assignment1")
+          (add-assignment "Assignment2" "Practical")
+          (add-submission "Submission1" "Suze" "Assignment1.1.1")
+          (add-submission "Submission1" "Joey" "Assignment1.1.1")
+          (add-submission "Submission1" "Suze" "Assignment1.1.2")
+          (add-submission "Submission1" "Joey" "Assignment1.1.2")
+          (add-submission "Submission1" "Suze" "Assignment1.2")
+          (add-submission "Submission1" "Joey" "Assignment1.2")
+          (add-submission "Submission1" "Suze" "Assignment2")
+          (add-submission "Submission5" "Joey" "Assignment2")
+          (add-submission "Submission5" "Suze" "Exam")
+          (add-submission "Submission7" "Joey" "Exam")
+          (let [db (d/db conn)]
+          (unit-mean-grades db ["Calculus" "Exam" "Practical"])))))
+
+;; Grades: Student Assignments
 (expect #{[0.1]}
         (with-redefs [conn (create-empty-in-memory-db)]
         (do
@@ -264,6 +295,46 @@
           (add-submission "Submission1" "Suze" "Assignment1")
           (let [db (d/db conn)]
           (student-assignment-grade db "Suze" "Assignment1")))))
+
+(expect #{[9.9]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-student "Jack")
+          (add-unit "Calculus")
+          (add-assignment "Assignment1" "Calculus")
+          (add-submission "Submission1" "Suze" "Assignment1")
+          (add-submission "Submission99" "Jack" "Assignment1")
+          (let [db (d/db conn)]
+          (student-assignment-grade db "Jack" "Assignment1")))))
+
+(expect #{[5.5]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-unit "Calculus")
+          (add-assignment "Assignment1" "Calculus")
+          (add-assignment "Assignment2" "Calculus")
+          (add-submission "Submission1" "Suze" "Assignment1")
+          (add-submission "Submission55" "Suze" "Assignment1")
+          (let [db (d/db conn)]
+          (student-assignment-grade db "Suze" "Assignment1")))))
+
+;; Grades: Student Unit means
+(expect #{[0.3]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-student "Jack")
+          (add-unit "Calculus")
+          (add-assignment "Assignment1" "Calculus")
+          (add-assignment "Assignment2" "Calculus")
+          (add-submission "Submission1" "Suze" "Assignment1")
+          (add-submission "Submission3" "Jack" "Assignment1")
+          (add-submission "Submission5" "Suze" "Assignment2")
+          (add-submission "Submission7" "Jack" "Assignment2")
+          (let [db (d/db conn)]
+          (student-unit-mean-grade db "Suze" "Calculus")))))
 
 (expect #{[5.5]}
         (with-redefs [conn (create-empty-in-memory-db)]
@@ -277,16 +348,48 @@
           (let [db (d/db conn)]
           (student-unit-mean-grade db "Suze" "Calculus")))))
 
-;; (expect #{[0.5]}
-;;         (with-redefs [conn (create-empty-in-memory-db)]
-;;         (do
-;;           (add-student "Suze")
-;;           (add-unit "Calculus")
-;;           (add-unit2 "Exam" "Calculus")
-;;           (add-unit2 "Practical" "Calculus")
-;;           (add-assignment "Assignment1" "Practical")
-;;           (add-assignment "Exam" "Exam")
-;;           (add-submission "Submission1" "Suze" "Assignment1")
-;;           (add-submission "Submission9" "Suze" "Exam")
-;;           (let [db (d/db conn)]
-;;           (student-unit-mean-grade db "Suze" "Calculus")))))
+(expect #{[0.5]}
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-unit "Calculus")
+          (add-unit2 "Exam" "Calculus")
+          (add-unit2 "Practical" "Calculus")
+          (add-assignment "Assignment1" "Practical")
+          (add-assignment "Exam" "Exam")
+          (add-submission "Submission1" "Suze" "Assignment1")
+          (add-submission "Submission9" "Suze" "Exam")
+          (let [db (d/db conn)]
+          (student-unit-mean-grade db "Suze" "Calculus")))))
+
+(expect (list #{[0.3]} #{[0.5]})
+        (with-redefs [conn (create-empty-in-memory-db)]
+        (do
+          (add-student "Suze")
+          (add-student "Joey")
+          (add-unit "Calculus")
+          (add-unit2 "Exam" "Calculus")
+          (add-assignment "Exam" "Exam")
+          (add-unit2 "Practical" "Calculus")
+          (add-unit2 "Assignment1" "Practical")
+          (add-unit2 "Assignment1.1" "Assignment1")
+          (add-assignment "Assignment1.1.1" "Assignment1.1")
+          (add-assignment "Assignment1.1.2" "Assignment1.1")
+          (add-assignment "Assignment1.2" "Assignment1")
+          (add-assignment "Assignment2" "Practical")
+          (add-submission "Submission1" "Suze" "Assignment1.1.1")
+          (add-submission "Submission1" "Joey" "Assignment1.1.1")
+          (add-submission "Submission1" "Suze" "Assignment1.1.2")
+          (add-submission "Submission1" "Joey" "Assignment1.1.2")
+          (add-submission "Submission1" "Suze" "Assignment1.2")
+          (add-submission "Submission1" "Joey" "Assignment1.2")
+          (add-submission "Submission1" "Suze" "Assignment2")
+          (add-submission "Submission5" "Joey" "Assignment2")
+          (add-submission "Submission5" "Suze" "Exam")
+          (add-submission "Submission7" "Joey" "Exam")
+          (let [db (d/db conn)]
+          (list
+           (student-unit-mean-grade db "Suze" "Calculus")
+           (student-unit-mean-grade db "Joey" "Calculus"))))))
+
+
